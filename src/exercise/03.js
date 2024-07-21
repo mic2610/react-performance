@@ -11,8 +11,9 @@ function Menu({
   getMenuProps,
   getItemProps,
   highlightedIndex,
-  selectedItem,
+  selectedItem
 }) {
+
   return (
     <ul {...getMenuProps()}>
       {items.map((item, index) => (
@@ -23,6 +24,8 @@ function Menu({
           index={index}
           selectedItem={selectedItem}
           highlightedIndex={highlightedIndex}
+          isSelected={selectedItem?.id === item.id}
+          isHighlighted={highlightedIndex === index}
         >
           {item.name}
         </ListItem>
@@ -32,16 +35,17 @@ function Menu({
 }
 // 🐨 Memoize the Menu here using React.memo
 
+Menu = React.memo(Menu);
+
 function ListItem({
   getItemProps,
   item,
   index,
-  selectedItem,
+  isSelected,
   highlightedIndex,
+  isHighlighted,
   ...props
 }) {
-  const isSelected = selectedItem?.id === item.id
-  const isHighlighted = highlightedIndex === index
   return (
     <li
       {...getItemProps({
@@ -58,15 +62,47 @@ function ListItem({
 }
 // 🐨 Memoize the ListItem here using React.memo
 
-function App() {
-  const forceRerender = useForceRerender()
-  const [inputValue, setInputValue] = React.useState('')
+// ListItem = React.memo(ListItem, (prevProps, nextProps) => {
+//   // Extra Credit 2
+//   if (prevProps.isHighlighted !== nextProps.isHighlighted)
+//     return false;
+  
+//   if (prevProps.isSelected !== nextProps.isSelected)
+//     return false;
 
-  const {data: allItems, run} = useAsync({data: [], status: 'pending'})
+//   // if (prevProps.getItemProps !== nextProps.getItemProps)
+//   //   return false;
+
+//   // if (prevProps.item !== nextProps.item ? false : true)
+//   //   return false;
+
+//   // if (prevProps.index !== nextProps.index)
+//   //   return false;
+
+//   // if (prevProps.selectedItem !== nextProps.selectedItem)
+//   //   return false;
+
+//   // if (prevProps.highlightedIndex !== nextProps.highlightedIndex)
+//   // {
+//   //   const wasPreviouslyHighlighted = prevProps.highlightedIndex === prevProps.index;
+//   //   const isNowHighlighted = nextProps.highlightedIndex === nextProps.highlightedIndex;
+//   //   return wasPreviouslyHighlighted === isNowHighlighted;
+//   //}
+// });
+
+
+// Extra Credit 2
+ListItem = React.memo(ListItem);
+
+function App() {
+  const forceRerender = useForceRerender();
+  const [inputValue, setInputValue] = React.useState('');
+
+  const {data: allItems, run} = useAsync({data: [], status: 'pending'});
   React.useEffect(() => {
     run(getItems(inputValue))
-  }, [inputValue, run])
-  const items = allItems.slice(0, 100)
+  }, [inputValue, run]);
+  const items = allItems.slice(0, 100);
 
   const {
     selectedItem,
@@ -88,7 +124,7 @@ function App() {
           : 'Selection Cleared',
       ),
     itemToString: item => (item ? item.name : ''),
-  })
+  });
 
   return (
     <div className="city-app">
